@@ -2,7 +2,10 @@ package com.example.example.services;
 
 
 import com.example.example.entities.Like;
+import com.example.example.entities.Post;
+import com.example.example.entities.User;
 import com.example.example.repository.LikeRepository;
+import com.example.example.requests.LikeCreateRequest;
 import com.example.example.responses.LikeResponse;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +37,27 @@ public class LikeService {
         }else
             list = likeRepository.findAll();
         return list.stream().map(like -> new LikeResponse(like)).collect(Collectors.toList());
+    }
+
+    public Like getOneLikeById(Long LikeId){
+        return likeRepository.findById(LikeId).orElse(null);
+    }
+
+    public Like createOneLike(LikeCreateRequest request){
+        User user = userService.getOneUserById(request.getUserId());
+        Post post = postService.getOnePostById(request.getPostId());
+        if(user != null && post != null){
+            Like likeToSave = new Like();
+            likeToSave.setId(request.getId());
+            likeToSave.setPost(post);
+            likeToSave.setUser(user);
+            return likeRepository.save(likeToSave);
+        }else
+            return null;
+    }
+
+    public void deleteOneLikeById(Long likeId) {
+        likeRepository.deleteById(likeId);
     }
 }
 
